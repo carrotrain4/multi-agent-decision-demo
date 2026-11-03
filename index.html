@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="汽车零部件制造场景下的多智能体协同决策平台交互式 Demo：主路由 Agent、知识问答 Agent、文档处理 Agent 与数据查询 Agent 并行协同。">
+  <meta name="theme-color" content="#07111f">
+  <title>智造协同 · 多智能体决策平台</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="ambient ambient-a" aria-hidden="true"></div>
+  <div class="ambient ambient-b" aria-hidden="true"></div>
+  <div class="grid-overlay" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <a class="brand" href="#top" aria-label="返回页面顶部">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 40 40" fill="none">
+          <path d="M20 4.5 33.4 12v16L20 35.5 6.6 28V12L20 4.5Z" stroke="currentColor" stroke-width="1.4"/>
+          <circle cx="20" cy="20" r="3.2" fill="currentColor"/>
+          <circle cx="20" cy="10.7" r="2.1" fill="currentColor" opacity=".86"/>
+          <circle cx="28.1" cy="15.4" r="2.1" fill="currentColor" opacity=".86"/>
+          <circle cx="28.1" cy="24.6" r="2.1" fill="currentColor" opacity=".86"/>
+          <circle cx="20" cy="29.3" r="2.1" fill="currentColor" opacity=".86"/>
+          <circle cx="11.9" cy="24.6" r="2.1" fill="currentColor" opacity=".86"/>
+          <circle cx="11.9" cy="15.4" r="2.1" fill="currentColor" opacity=".86"/>
+          <path d="M20 13.2v3.3M22.7 18.5l2.9-1.7M22.7 21.5l2.9 1.7M20 26.8v-3.3M17.3 21.5l-2.9 1.7M17.3 18.5l-2.9-1.7" stroke="currentColor" stroke-width="1.1" opacity=".65"/>
+        </svg>
+      </span>
+      <span class="brand-copy">
+        <span class="brand-name">智造协同</span>
+        <span class="brand-sub">MULTI-AGENT DECISION PLATFORM</span>
+      </span>
+    </a>
+
+    <nav class="main-nav" aria-label="页面导航">
+      <a href="#workspace" class="active">决策工作台</a>
+      <a href="#knowledge">知识资产</a>
+      <a href="#architecture">架构说明</a>
+    </nav>
+
+    <div class="topbar-actions">
+      <span class="live-pill"><span class="live-dot"></span>系统在线<span class="pill-sep"></span>DEMO 沙箱</span>
+      <a class="source-link" href="https://github.com/carrotrain4/multi-agent-decision-demo" target="_blank" rel="noreferrer" aria-label="查看 GitHub 源码">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+          <path d="M9 18c-4.2 1.2-4.2-2.1-6-2.5M15 21v-3.4c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.7 4.7 0 0 0-1.3-3.3c.2-.7.3-2-1-3.3 0 0-1.2-.4-3.7 1.4a12.7 12.7 0 0 0-7 0C4.5 2.6 3.3 3 3.3 3c-1.3 1.3-1.2 2.6-1 3.3A4.7 4.7 0 0 0 1 9.6c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/>
+        </svg>
+        <span>源码</span>
+      </a>
+    </div>
+  </header>
+
+  <main class="shell" id="top">
+    <section class="hero" aria-labelledby="heroTitle">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="eyebrow-index">01</span><span>MANUFACTURING INTELLIGENCE</span><span class="eyebrow-line"></span></div>
+        <h1 id="heroTitle">让复杂排障，<span>由多智能体协同完成。</span></h1>
+        <p>面向汽车零部件制造场景的决策控制台。主路由 Agent 负责意图识别与任务拆解，知识、文档与数据 Agent 并行取证，最终汇聚为<strong>可追溯、可执行</strong>的处置建议。</p>
+        <div class="hero-tags" aria-label="项目能力标签">
+          <span><i class="tag-dot"></i>LangGraph 编排设计</span>
+          <span><i class="tag-dot"></i>MCP 工具复用</span>
+          <span><i class="tag-dot"></i>DAG 并行执行</span>
+          <span><i class="tag-dot"></i>容错降级</span>
+        </div>
+      </div>
+
+      <div class="hero-metrics" aria-label="平台关键指标">
+        <article class="metric-card accent">
+          <div class="metric-top"><span class="metric-label">协同响应</span><span class="metric-trend">实时</span></div>
+          <div class="metric-value"><strong id="metricLatency">1.8</strong><span>s</span></div>
+          <div class="metric-foot"><span class="spark-bars" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span><span>P50 端到端</span></div>
+        </article>
+        <article class="metric-card">
+          <div class="metric-top"><span class="metric-label">任务成功率</span><span class="metric-trend">近 7 日</span></div>
+          <div class="metric-value"><strong id="metricSuccess">98.6</strong><span>%</span></div>
+          <div class="metric-foot"><span class="metric-line positive"></span><span>+3.2% 对比单 Agent</span></div>
+        </article>
+        <article class="metric-card">
+          <div class="metric-top"><span class="metric-label">推理耗时</span><span class="metric-trend">↓ 优化</span></div>
+          <div class="metric-value"><strong>42</strong><span>%</span></div>
+          <div class="metric-foot"><span class="metric-line"></span><span>Qwen-7B INT4</span></div>
+        </article>
+        <article class="metric-card">
+          <div class="metric-top"><span class="metric-label">场景验证</span><span class="metric-trend">全通过</span></div>
+          <div class="metric-value"><strong>3</strong><span>/3</span></div>
+          <div class="metric-foot"><span class="metric-line positive"></span><span>典型业务流程</span></div>
+        </article>
+      </div>
+    </section>
+
+    <section class="scenario-section" aria-labelledby="scenarioTitle">
+      <div class="section-heading">
+        <div>
+          <span class="section-kicker">02 / SCENARIO SANDBOX</span>
+          <h2 id="scenarioTitle">选择一个生产现场任务</h2>
+        </div>
+        <div class="heading-meta"><span class="status-mini"></span>预设场景均完成全流程验证</div>
+      </div>
+
+      <div class="scenario-grid" id="scenarioGrid">
+        <button class="scenario-card active" data-scene="maintenance" type="button" aria-pressed="true">
+          <span class="scenario-topline"><span class="scenario-index">SCENE 01</span><span class="scenario-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M14.7 6.3a4 4 0 0 0-5.4 4.9l-6 6a2.1 2.1 0 0 0 3 3l6-6a4 4 0 0 0 4.9-5.4l-2.6 2.6-2.4-.5-.5-2.4 3-2.2Z"/></svg></span></span>
+          <span class="scenario-title-row"><strong>主轴异响紧急排障</strong><span class="badge danger">P1</span></span>
+          <span class="scenario-desc">CNC-07 周期性异响，需要联动维修手册、历史工单与实时振动数据完成故障定位。</span>
+          <span class="scenario-bottom"><span><i class="tiny-dot"></i>3 Agents · 4 Tools</span><span class="arrow">↗</span></span>
+        </button>
+
+        <button class="scenario-card" data-scene="compliance" type="button" aria-pressed="false">
+          <span class="scenario-topline"><span class="scenario-index">SCENE 02</span><span class="scenario-icon blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 11.5 11 13.5l4-4"/><path d="M6.5 3.5h8l4 4V19a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 6.5 19V5A1.5 1.5 0 0 1 8 3.5Z"/><path d="M14.5 3.5V8h4"/></svg></span></span>
+          <span class="scenario-title-row"><strong>装配扭矩合规核查</strong><span class="badge warning">QUALITY</span></span>
+          <span class="scenario-desc">A-12 工位扭矩抽检出现漂移，需要对照新版工艺规范与近 7 日装配数据核验合规性。</span>
+          <span class="scenario-bottom"><span><i class="tiny-dot"></i>3 Agents · 5 Tools</span><span class="arrow">↗</span></span>
+        </button>
+
+        <button class="scenario-card" data-scene="downtime" type="button" aria-pressed="false">
+          <span class="scenario-topline"><span class="scenario-index">SCENE 03</span><span class="scenario-icon violet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 19.5V13m5 6.5V8m5 11.5V5m5 14.5v-9"/><path d="M2.5 21h19"/></svg></span></span>
+          <span class="scenario-title-row"><strong>停机损失窗口测算</strong><span class="badge info">OPS</span></span>
+          <span class="scenario-desc">统计 Line 2 近 7 天停机损失，结合维保计划与产能数据推荐最优检修窗口。</span>
+          <span class="scenario-bottom"><span><i class="tiny-dot"></i>2 Agents · 4 Tools</span><span class="arrow">↗</span></span>
+        </button>
+      </div>
+    </section>
+
+    <section class="workspace" id="workspace" aria-label="多智能体决策工作台">
+      <div class="workspace-main">
+        <article class="panel command-panel">
+          <div class="panel-heading">
+            <div>
+              <span class="section-kicker">03 / COMMAND</span>
+              <h3>下发现场任务</h3>
+            </div>
+            <span class="context-chip" id="contextChip"><span class="context-dot"></span>设备故障诊断</span>
+          </div>
+
+          <label class="sr-only" for="queryInput">输入任务指令</label>
+          <div class="command-box">
+            <textarea id="queryInput" rows="3" spellcheck="false">CNC-07 主轴出现周期性异响，振动值升至 4.6 mm/s。请结合维修手册、近 90 天故障工单和备件库存，给出排障步骤与停机建议。</textarea>
+            <div class="command-tools" aria-label="启用的 MCP 工具">
+              <span class="tool-chip"><i></i>manual.search</span>
+              <span class="tool-chip"><i></i>fault.history</span>
+              <span class="tool-chip"><i></i>inventory.lookup</span>
+              <span class="tool-chip"><i></i>metrics.query</span>
+            </div>
+          </div>
+
+          <div class="command-footer">
+            <label class="switch-control" for="faultToggle" title="开启后，数据 Agent 将演示超时重试与缓存降级">
+              <input type="checkbox" id="faultToggle">
+              <span class="switch-track"><span class="switch-thumb"></span></span>
+              <span class="switch-copy"><strong>故障注入</strong><small>演示重试与降级</small></span>
+            </label>
+            <div class="command-actions">
+              <span class="keyboard-hint">Ctrl <b>↵</b></span>
+              <button class="run-btn" id="runButton" type="button">
+                <span class="run-btn-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M5.6 5.6l2.8 2.8M15.6 15.6l2.8 2.8M18.4 5.6l-2.8 2.8M8.4 15.6l-2.8 2.8"/><circle cx="12" cy="12" r="3"/></svg></span>
+                <span class="run-btn-label" id="runBtnLabel">发起协同决策</span>
+                <span class="run-btn-arrow">→</span>
+              </button>
+            </div>
+          </div>
+        </article>
+
+        <article class="panel topology-panel">
+          <div class="panel-heading">
+            <div>
+              <span class="section-kicker">04 / LIVE ORCHESTRATION</span>
+              <h3>Agent 协同拓扑</h3>
+            </div>
+            <div class="run-meta">
+              <span class="run-status idle" id="runStatus"><i></i><span id="runStatusText">待命</span></span>
+              <span class="run-timer" id="runTimer">00:00.0</span>
+            </div>
+          </div>
+
+          <div class="dag-scroll">
+            <div class="dag-stage" id="dagStage">
+              <svg class="dag-edges" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+                <defs>
+                  <marker id="edgeArrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse">
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill="context-stroke"></path>
+                  </marker>
+                </defs>
+                <path class="edge" id="edge-input-router" d="M 16.2 50 L 21.2 50" marker-end="url(#edgeArrow)"/>
+                <path class="edge" id="edge-router-qa" d="M 36.2 50 C 40.5 50 41.2 18 45.8 18" marker-end="url(#edgeArrow)"/>
+                <path class="edge" id="edge-router-doc" d="M 36.2 50 L 45.8 50" marker-end="url(#edgeArrow)"/>
+                <path class="edge" id="edge-router-data" d="M 36.2 50 C 40.5 50 41.2 82 45.8 82" marker-end="url(#edgeArrow)"/>
+                <path class="edge" id="edge-qa-agg" d="M 65.2 18 C 73 18 74.5 50 82.4 50" marker-end="url(#edgeArrow)"/>
+                <path class="edge" id="edge-doc-agg" d="M 65.2 50 L 82.4 50" marker-end="url(#edgeArrow)"/>
+                <path class="edge" id="edge-data-agg" d="M 65.2 82 C 73 82 74.5 50 82.4 50" marker-end="url(#edgeArrow)"/>
+              </svg>
+
+              <div class="dag-node node-input" id="node-input" data-node="input">
+                <span class="node-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5 4.5h14v15H5z"/><path d="M8 8h8M8 11.5h8M8 15h5"/></svg></span>
+                <span class="node-copy"><small>INPUT</small><strong>工单输入</strong><em>现场指令</em></span>
+                <span class="node-time">—</span>
+              </div>
+
+              <div class="dag-node node-router" id="node-router" data-node="router">
+                <span class="node-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="6" cy="6" r="2.2"/><circle cx="18" cy="6" r="2.2"/><circle cx="12" cy="18" r="2.2"/><path d="M8.2 6h7.6M7.1 7.8l3.6 8M16.9 7.8l-3.6 8"/></svg></span>
+                <span class="node-copy"><small>ORCHESTRATOR</small><strong>主路由 Agent</strong><em id="routerIntent">等待任务</em></span>
+                <span class="node-time">—</span>
+              </div>
+
+              <div class="dag-node node-agent node-qa" id="node-qa" data-node="qa">
+                <span class="node-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4.5 5.5h15v10h-9l-4 3v-3H4.5z"/><path d="M8 9.5h8M8 12h5"/></svg></span>
+                <span class="node-copy"><small>KNOWLEDGE</small><strong>问答 Agent</strong><em>知识检索</em></span>
+                <span class="node-time">—</span>
+              </div>
+
+              <div class="dag-node node-agent node-doc" id="node-doc" data-node="doc">
+                <span class="node-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M7 3.5h7l4 4V20H7z"/><path d="M14 3.5V8h4M10 12h5M10 15.5h5"/></svg></span>
+                <span class="node-copy"><small>DOCUMENT</small><strong>文档 Agent</strong><em>工单对齐</em></span>
+                <span class="node-time">—</span>
+              </div>
+
+              <div class="dag-node node-agent node-data" id="node-data" data-node="data">
+                <span class="node-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><ellipse cx="12" cy="5.5" rx="7" ry="3"/><path d="M5 5.5v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/><path d="M5 11.5v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/></svg></span>
+                <span class="node-copy"><small>DATA</small><strong>数据 Agent</strong><em>结构化查询</em></span>
+                <span class="node-time">—</span>
+              </div>
+
+              <div class="dag-node node-agg" id="node-agg" data-node="agg">
+                <span class="node-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 5h5l6 7-6 7H4l6-7z"/><path d="M13 5h7v14h-7l-4-7z"/></svg></span>
+                <span class="node-copy"><small>SYNTHESIS</small><strong>结果汇聚</strong><em>交叉验证</em></span>
+                <span class="node-time">—</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="topology-legend">
+            <span><i class="legend-dot running"></i>执行中</span>
+            <span><i class="legend-dot success"></i>已完成</span>
+            <span><i class="legend-dot warning"></i>降级/重试</span>
+            <span class="legend-note">子 Agent 并行调用 · 异步结果聚合</span>
+          </div>
+        </article>
+
+        <article class="panel event-panel">
+          <div class="panel-heading compact">
+            <div>
+              <span class="section-kicker">05 / EVENT STREAM</span>
+              <h3>执行事件流</h3>
+            </div>
+            <span class="stream-badge"><i></i>SSE LIVE</span>
+          </div>
+          <div class="event-log" id="eventLog" aria-live="polite">
+            <div class="event-empty">等待任务下发，事件流将在此实时展示。</div>
+          </div>
+        </article>
+      </div>
+
+      <aside class="workspace-side">
+        <article class="panel result-panel" id="resultPanel" aria-live="polite">
+          <div class="panel-heading">
+            <div>
+              <span class="section-kicker">06 / DECISION BRIEF</span>
+              <h3>协同决策简报</h3>
+            </div>
+            <span class="result-state" id="resultState"><i></i><span>WAITING</span></span>
+          </div>
+          <div class="result-content" id="resultContent">
+            <div class="result-placeholder">
+              <span class="placeholder-orbit"><i></i><i></i><i></i></span>
+              <strong>等待 Agent 协同结果</strong>
+              <p>选择场景并下发任务后，这里将聚合知识证据、业务数据与处置建议。</p>
+            </div>
+          </div>
+        </article>
+
+        <div class="side-grid">
+          <article class="panel health-panel">
+            <div class="panel-heading compact">
+              <div>
+                <span class="section-kicker">HEALTH</span>
+                <h3>运行健康度</h3>
+              </div>
+              <span class="tiny-live"><i></i>LIVE</span>
+            </div>
+            <div class="health-list">
+              <div class="health-row">
+                <span class="health-agent qa"></span>
+                <div><strong>问答 Agent</strong><small>manual.search</small></div>
+                <span class="health-value">99.2%</span>
+              </div>
+              <div class="health-row">
+                <span class="health-agent doc"></span>
+                <div><strong>文档 Agent</strong><small>fault.history</small></div>
+                <span class="health-value">98.7%</span>
+              </div>
+              <div class="health-row">
+                <span class="health-agent data"></span>
+                <div><strong>数据 Agent</strong><small>sql.query</small></div>
+                <span class="health-value">99.5%</span>
+              </div>
+            </div>
+            <div class="health-footer">
+              <span><i class="tiny-dot green"></i>Redis 语义缓存</span>
+              <strong id="cacheMetric">32% HIT</strong>
+            </div>
+          </article>
+
+          <article class="panel circuit-panel" id="circuitPanel">
+            <div class="panel-heading compact">
+              <div>
+                <span class="section-kicker">RESILIENCE</span>
+                <h3>容错熔断</h3>
+              </div>
+              <span class="circuit-badge closed" id="circuitBadge"><i></i>CLOSED</span>
+            </div>
+            <div class="failure-meter" id="failureMeter" aria-label="连续失败计数">
+              <i></i><i></i><i></i><i></i><i></i>
+            </div>
+            <p class="circuit-copy" id="circuitCopy">连续失败 <b>0 / 5</b> · 超时重试已启用</p>
+            <button class="breaker-btn" id="breakerDemo" type="button">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M13 2 4.5 13H11l-1 9 8.5-11H12l1-9Z"/></svg>
+              运行容错演练
+            </button>
+          </article>
+        </div>
+      </aside>
+    </section>
+
+    <section class="knowledge-section" id="knowledge" aria-labelledby="knowledgeTitle">
+      <div class="section-heading">
+        <div>
+          <span class="section-kicker">07 / KNOWLEDGE ASSETS</span>
+          <h2 id="knowledgeTitle">连接分散的制造知识</h2>
+        </div>
+        <div class="heading-meta"><span class="status-mini"></span>统一索引 · 可追溯引用</div>
+      </div>
+
+      <div class="knowledge-stats">
+        <div><strong>4</strong><span>类知识资产</span></div>
+        <div><strong>1,284</strong><span>语义切片</span></div>
+        <div><strong>12.8k</strong><span>结构化数据行</span></div>
+        <div><strong>&lt; 180ms</strong><span>混合检索延迟</span></div>
+      </div>
+
+      <div class="asset-grid">
+        <article class="asset-card">
+          <div class="asset-icon pdf">PDF</div>
+          <div class="asset-main"><strong>设备维修手册_v4.2</strong><span>248 页 · 设备结构与维修工艺</span></div>
+          <div class="asset-status"><i></i>已索引</div>
+        </article>
+        <article class="asset-card">
+          <div class="asset-icon xls">XLS</div>
+          <div class="asset-main"><strong>CNC-07_故障工单_2026Q3</strong><span>86 条工单 · 近 90 天故障履历</span></div>
+          <div class="asset-status"><i></i>已索引</div>
+        </article>
+        <article class="asset-card">
+          <div class="asset-icon doc">DOC</div>
+          <div class="asset-main"><strong>装配工艺规范_SOP-A12</strong><span>扭矩标准 · 变更通知 CN-2026-08</span></div>
+          <div class="asset-status"><i></i>已索引</div>
+        </article>
+        <article class="asset-card">
+          <div class="asset-icon sql">SQL</div>
+          <div class="asset-main"><strong>ERP · 备件主数据</strong><span>库存 / 采购周期 / 替代料关系</span></div>
+          <div class="asset-status"><i></i>已连接</div>
+        </article>
+        <article class="asset-card">
+          <div class="asset-icon yaml">YML</div>
+          <div class="asset-main"><strong>predictive_maintenance_mcp</strong><span>MCP Tool Schema · 4 个可复用能力</span></div>
+          <div class="asset-status"><i></i>已注册</div>
+        </article>
+      </div>
+    </section>
+
+    <section class="architecture-section" id="architecture" aria-labelledby="architectureTitle">
+      <div class="section-heading">
+        <div>
+          <span class="section-kicker">08 / ARCHITECTURE</span>
+          <h2 id="architectureTitle">分层编排，能力可复用</h2>
+        </div>
+        <div class="heading-meta"><span class="status-mini"></span>交互式前端原型 · 状态机驱动</div>
+      </div>
+
+      <div class="architecture-layout">
+        <article class="panel architecture-flow">
+          <div class="arch-layer">
+            <span class="arch-index">01</span>
+            <div><small>INTERACTION</small><strong>交互层</strong><p>Web 决策控制台 · SSE 事件流 · 证据追溯</p></div>
+            <span class="arch-tag">Frontend</span>
+          </div>
+          <div class="arch-connector"><i></i></div>
+          <div class="arch-layer">
+            <span class="arch-index">02</span>
+            <div><small>ORCHESTRATION</small><strong>编排层</strong><p>主路由 Agent → DAG Planner → 并行执行器 → 结果汇聚</p></div>
+            <span class="arch-tag cyan">LangGraph</span>
+          </div>
+          <div class="arch-connector"><i></i></div>
+          <div class="arch-layer agent-layer">
+            <span class="arch-index">03</span>
+            <div><small>CAPABILITY</small><strong>能力层</strong><p class="agent-pills"><span>问答 Agent</span><span>文档 Agent</span><span>数据 Agent</span></p></div>
+            <span class="arch-tag blue">Agents</span>
+          </div>
+          <div class="arch-connector"><i></i></div>
+          <div class="arch-layer">
+            <span class="arch-index">04</span>
+            <div><small>TOOLING</small><strong>工具层</strong><p>MCP Registry · Skill 复用 · 权限与审计</p></div>
+            <span class="arch-tag violet">MCP</span>
+          </div>
+          <div class="arch-connector"><i></i></div>
+          <div class="arch-layer">
+            <span class="arch-index">05</span>
+            <div><small>DATA</small><strong>数据层</strong><p>维修手册 / 工单 / ERP / 时序数据库 / Redis</p></div>
+            <span class="arch-tag amber">Storage</span>
+          </div>
+        </article>
+
+        <div class="architecture-details">
+          <article class="feature-card">
+            <span class="feature-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="5" cy="12" r="2"/><circle cx="19" cy="6" r="2"/><circle cx="19" cy="18" r="2"/><path d="M7 12h4c2 0 2-6 4-6h2M11 12c2 0 2 6 4 6h2"/></svg></span>
+            <div><strong>DAG 并行编排</strong><p>复杂任务自动拆解为可并行的子任务，异步聚合结果，减少串行等待。</p></div>
+            <span class="feature-value">-36% 耗时</span>
+          </article>
+          <article class="feature-card">
+            <span class="feature-icon amber"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M13 2 4.5 13H11l-1 9 8.5-11H12l1-9Z"/></svg></span>
+            <div><strong>容错熔断与降级</strong><p>连续失败 5 次触发熔断，半开探测恢复；超时按指数退避重试，最多 3 次。</p></div>
+            <span class="feature-value">99.9% 可用</span>
+          </article>
+          <article class="feature-card">
+            <span class="feature-icon violet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><ellipse cx="12" cy="5.5" rx="7" ry="3"/><path d="M5 5.5v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6M5 11.5v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"/></svg></span>
+            <div><strong>多级缓存优先</strong><p>Redis 语义缓存与知识快照兜底，在模型或外部工具异常时保持可回答。</p></div>
+            <span class="feature-value">32% 命中</span>
+          </article>
+          <article class="feature-card">
+            <span class="feature-icon green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M20 11.5a8 8 0 1 1-2.3-5.7"/><path d="M20 4v7.5h-7.5"/><path d="m8.5 12 2.3 2.3 4.7-4.6"/></svg></span>
+            <div><strong>可追溯结果</strong><p>每条结论绑定文档页码、数据行与检索得分，降低幻觉并支持人工复核。</p></div>
+            <span class="feature-value">3 源交叉验证</span>
+          </article>
+
+          <article class="tech-stack-card">
+            <span class="section-kicker">TECH STACK / DESIGN REFERENCE</span>
+            <div class="stack-chips">
+              <span>LangGraph</span><span>FastAPI</span><span>Qwen-7B INT4</span><span>Redis</span><span>MCP</span><span>RAG</span><span>SSE</span><span>Vanilla JS Demo</span>
+            </div>
+            <p>本页面为可交互前端原型：内置事件状态机模拟 Agent 协同、DAG 并行、重试与熔断。生产版本可按相同事件协议接入 LangGraph / FastAPI 后端。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-brand">
+      <span class="brand-mark small" aria-hidden="true">
+        <svg viewBox="0 0 40 40" fill="none"><path d="M20 4.5 33.4 12v16L20 35.5 6.6 28V12L20 4.5Z" stroke="currentColor" stroke-width="1.4"/><circle cx="20" cy="20" r="3.2" fill="currentColor"/></svg>
+      </span>
+      <span>智造协同 · Multi-Agent Decision Platform</span>
+    </div>
+    <p>汽车零部件制造场景 · 个人实践项目演示 <span class="footer-sep">/</span> Built with an interactive orchestration state machine</p>
+    <span class="footer-year">© 2026</span>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <div class="modal-backdrop" id="evidenceModal" aria-hidden="true">
+    <div class="evidence-modal" role="dialog" aria-modal="true" aria-labelledby="evidenceTitle">
+      <button class="modal-close" id="modalClose" type="button" aria-label="关闭证据详情">×</button>
+      <span class="section-kicker">SOURCE EVIDENCE</span>
+      <h3 id="evidenceTitle">证据详情</h3>
+      <div class="evidence-meta" id="evidenceMeta"></div>
+      <blockquote id="evidenceExcerpt"></blockquote>
+      <div class="evidence-footer">
+        <span>检索相关性</span>
+        <div class="score-track"><i id="evidenceScore"></i></div>
+        <strong id="evidenceScoreText">0.00</strong>
+      </div>
+    </div>
+  </div>
+
+  <noscript>
+    <div class="noscript">此 Demo 需要启用 JavaScript 才能体验多智能体协同流程。</div>
+  </noscript>
+  <script src="app.js"></script>
+</body>
+</html>
